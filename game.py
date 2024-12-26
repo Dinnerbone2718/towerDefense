@@ -133,33 +133,33 @@ class Button:
         if self.name == "backButton":
             menu.currentScreen = "title"
             pygame.mixer_music.stop()
+
         if self.name == "map1Select":
-            inGame = True
-            game.newGame(1)
+            menu.currentScreen = "gameSelected"
+            menu.mapDisplay = 1
+        elif self.name == "map2Select":
+            menu.currentScreen = "gameSelected"
+            menu.mapDisplay = 2
+        elif self.name == "map3Select":
+            menu.currentScreen = "gameSelected"
+            menu.mapDisplay = 3
+        elif self.name == "map4Select":
+            menu.currentScreen = "gameSelected"
+            menu.mapDisplay = 4
+        elif self.name == "map5Select":
+            menu.currentScreen = "gameSelected"
+            menu.mapDisplay = 5
+        elif self.name == "map6Select":
+            menu.currentScreen = "gameSelected"
+            menu.mapDisplay = 6
+        elif self.name == "map7Select":
+            menu.currentScreen = "gameSelected"
+            menu.mapDisplay = 7
+        elif self.name == "map8Select":
+            menu.currentScreen = "gameSelected"
+            menu.mapDisplay = 8
 
-        if self.name == "map2Select":
-            inGame = True
-            game.newGame(2)
 
-        if self.name == "map3Select":
-            inGame = True
-            game.newGame(3)
-
-        if self.name == "map4Select":
-            inGame = True
-            game.newGame(4)
-
-        if self.name == "map5Select":
-            inGame = True
-            game.newGame(5)
-
-        if self.name == "map6Select":
-            inGame = True
-            game.newGame(6)
-
-        if self.name == "map7Select":
-            inGame = True
-            game.newGame(7)
 
         if self.name == "settingsButton":
             pygame.mixer.music.load(f"{prefix}music/SettingsSong.mp3")
@@ -228,9 +228,17 @@ class Button:
             if int(min(np.floor(cash*.01), 9999)) >= 200:
                    ownedmaps.append(7)
                    cash -= 20000
+        
+        if self.name == "back":
+            menu.currentScreen = "menu"
 
         if self.name == "menuCat":
             audio.menuCat.play()
+
+        if self.name == "playButtonInGame":
+            game.newGame(menu.mapDisplay)
+            inGame = True
+            menu.currentScreen = "menu"
 
 class Menu:
     def __init__(self):
@@ -301,10 +309,27 @@ class Menu:
 
 
 
+
+        self.gameSelectBackground = pygame.image.load(f"{prefix}UI/gameSelectBackground.png").convert_alpha()
+        self.gameSelectBackground = pygame.transform.scale(self.gameSelectBackground, (1000, 700))
+
+
         self.lobbyMappings = {
             0:self.lobby0,
             1:self.lobby1,
             2:self.lobby2
+        }
+
+        self.nameLookup = {
+            1:"Mellow Meadows",
+            2:"Happy Hills",
+            3:"Magma Marsh",
+            4:"Paw Planet",
+            5:"Lily Pad Lagoon",
+            6:"Carnivorous Cave",
+            7:"Rocky Road"
+
+
         }
 
 
@@ -377,7 +402,13 @@ class Menu:
 
         self.menuCat = Button("menuCat",1015, 700, 210,240)
 
+        self.playInGameButton = Button("playButtonInGame", 290, 550, 190,120)
+
+        self.back = Button("back", 1025, 165, 90, 90)
+
         self.clock = pygame.time.Clock()
+
+        self.mapDisplay = 0
 
         self.spin = False
 
@@ -517,6 +548,13 @@ class Menu:
                     skinsApplied[key] = self.indexer[key]
                 else:
                     screen.blit(pygame.image.load(f"{prefix}ui/locked.png"), (x, y))
+
+        elif self.currentScreen == "gameSelected":
+            screen.blit(self.gameSelectBackground, (100,100))
+            screen.blit(pygame.image.load(f"{prefix}UI/map{self.mapDisplay}Select0.png"),(200,160))
+            self.draw_text(str(self.nameLookup[self.mapDisplay]), "BLACK", 400, 200, 70)
+            self.playInGameButton.update()
+            self.back.update()
 
 class Audio:
     def __init__(self):
