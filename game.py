@@ -435,7 +435,7 @@ class Menu:
                 self.map7Load.update()
 
             self.nextButton.update()
-            #self.onlineButton.update()
+            self.onlineButton.update()
 
         elif self.currentScreen == "menu":
             screen.blit(self.menuImg, (0,0))       
