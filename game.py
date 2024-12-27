@@ -82,15 +82,6 @@ skinsApplied = {
 
 
 
-
-
-
-
-
-
-
-
-
 class Button:
     def __init__(self, name, x, y, width, height, load=0):
         self.hover = pygame.image.load(f"{prefix}UI/{name}1.png").convert_alpha()
@@ -2700,7 +2691,7 @@ class towerSelect:
         "3-0": "Potions deal more damage, deal rubber damage",
         "4-0": "Potions deal even more damage",
     }
-    towerDescriptionsFishFarm = {
+    towerDescriptionsfishFarm = {
         "0-1": "Generates fish more often",
         "0-2": "Automatically collects fish",
         "0-3": "Generates fish more often",
@@ -3489,9 +3480,8 @@ class towerEntity:
         # Dynamically select the correct upgrade price dictionary based on cat type
         tempName = re.sub(r'\d+', '', self.name)
         upgradePrices = getattr(towerSelect, f"towerUpgradePrices{tempName}", {})
-        
+
         hoverText = getattr(towerSelect, f"towerDescriptions{tempName}", {})
-   
 
 
         # Handle Left Upgrade
