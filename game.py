@@ -227,7 +227,7 @@ class Button:
             audio.menuCat.play()
 
         if self.name == "playButtonInGame":
-            game.newGame(menu.mapDisplay)
+            game.newGame(menu.mapDisplay, menu.selectedGamemode)
             inGame = True
             menu.currentScreen = "menu"
 
@@ -298,7 +298,7 @@ class Menu:
         self.cashImg = pygame.image.load(f"{prefix}UI/cashIcon.png").convert_alpha()
         self.cashImg = pygame.transform.scale(self.cashImg, (140, 70))
 
-
+        self.selectedGamemode = "normal"
 
 
         self.gameSelectBackground = pygame.image.load(f"{prefix}UI/gameSelectBackground.png").convert_alpha()
@@ -395,6 +395,10 @@ class Menu:
         self.easyButton = Button("easyButton", 290, 415, 110,110)
         self.mediumButton = Button("mediumButton", 290, 415, 110,110)
         self.hardButton = Button("hardButton", 290, 415, 110,110)
+
+        self.normalMode = pygame.image.load(f"{prefix}UI/normalGamemode.png").convert_alpha()
+        self.sandboxMode = pygame.image.load(f"{prefix}UI/sandboxGamemode.png").convert_alpha()
+        self.moneyHealthMode = pygame.image.load(f"{prefix}UI/moneyHealthGamemode.png").convert_alpha()
 
         self.clock = pygame.time.Clock()
 
@@ -540,6 +544,29 @@ class Menu:
             self.draw_text(str(self.nameLookup[self.mapDisplay]), "BLACK", 400, 200, 70)
             self.playInGameButton.update()
             self.back.update()
+            screen.blit(self.normalMode, (450, 560))
+            screen.blit(self.sandboxMode, (650, 560))
+            screen.blit(self.moneyHealthMode, (850, 560))
+
+            if self.selectedGamemode == "normal":
+                pygame.draw.rect(screen, "GREEN", pygame.Rect(450, 560, 180, 180), 10)
+            if self.selectedGamemode == "sandbox":
+                pygame.draw.rect(screen, "GREEN", pygame.Rect(650, 560, 180, 180), 10)
+            if self.selectedGamemode == "cashhealth":
+                pygame.draw.rect(screen, "GREEN", pygame.Rect(850, 560, 180, 180), 10)
+
+            if 450 < mousePos[0] < 630 and 560 < mousePos[1] < 740:
+                pygame.draw.rect(screen, "YELLOW", pygame.Rect(450, 560, 180, 180), 10)
+                if mousePress[0] and mouseUp:
+                    self.selectedGamemode = "normal"
+            if 650 < mousePos[0] < 830 and 560 < mousePos[1] < 740:
+                pygame.draw.rect(screen, "YELLOW", pygame.Rect(650, 560, 180, 180), 10)
+                if mousePress[0] and mouseUp:
+                    self.selectedGamemode = "sandbox"
+            if 850 < mousePos[0] < 1030 and 560 < mousePos[1] < 740:
+                pygame.draw.rect(screen, "YELLOW", pygame.Rect(850, 560, 180, 180), 10)
+                if mousePress[0] and mouseUp:
+                    self.selectedGamemode = "cashhealth"
 
             if self.difficulty == 1:
                 self.easyButton.update()
@@ -1205,6 +1232,8 @@ class GameManager:
 
         self.towersMenuSelect = []
 
+        self.gamemode = "normal"
+
 
         self.moneyIcon = pygame.image.load(f"{prefix}ui/fishMoney.png").convert_alpha()
         self.moneyIcon = pygame.transform.scale(self.moneyIcon, (80, 40))
@@ -1247,8 +1276,10 @@ class GameManager:
                 'index': self.roundIndex,
                 'health': self.health,
                 'round': self.round,
+                'gamemode': self.gamemode,
                 'yarn': [yarn.toDict() for yarn in game.yarnList],
                 'towers': [tower.toDict() for tower in game.towersOnMap]
+    
             }
 
 
@@ -1352,6 +1383,7 @@ class GameManager:
         self.round = data.get("round")
         game.money = data.get("money")
         game.difficulty = data.get("difficulty")
+        game.gamemode = data.get("gamemode")
 
         game.yarnList = [yarn.fromDict(yarnData) for yarnData in data.get("yarn", [])]
         game.towersOnMap = [towerEntity.fromDict(towerData) for towerData in data.get("towers", [])]
@@ -1389,7 +1421,7 @@ class GameManager:
             y2 = y1 + size
             self.track.append((x1, y1, x2, y2))
 
-    def newGame(self, map):
+    def newGame(self, map, gamemode):
         global pause
         if map == 1:
             self.track = [(0, 200, 600, 300), (500, 0, 600, 300), (300, 0, 600, 100), (300, 0, 400, 800), (100, 700, 400, 800), (100, 500, 200, 800), (100, 500, 800, 600), (700, 500, 800, 900)]
@@ -1444,6 +1476,7 @@ class GameManager:
         self.map = pygame.image.load(f"{prefix}maps/map{map}.png").convert_alpha()
         self.map = pygame.transform.scale(self.map, (900, 900))
 
+        self.gamemode = gamemode
 
         self.textTime = 0
 
@@ -1616,9 +1649,16 @@ class GameManager:
         self.mousePress = mousePress
         self.hover = None
 
+        if self.gamemode == "cashhealth":
+            self.health = self.money
+
         moneyMod = 1
         if self.difficulty == 3:
             moneyMod = 1.5
+
+
+        if self.gamemode == "sandbox":
+            self.money = 100000
 
         for tower in self.towersOnMapToRemove:
             self.towersOnMap.remove(tower)
@@ -1740,9 +1780,13 @@ class GameManager:
         if self.selected == None:
             self.displayPrice = None
 
-        self.gameUIWindow.blit(self.moneyIcon, (200,850))
-        self.gameUIWindow.blit(self.healthIcon, (240,780))
-        
+        if game.gamemode != "cashhealth":
+            self.gameUIWindow.blit(self.healthIcon, (240,780))
+            self.gameUIWindow.blit(self.moneyIcon, (200,850))
+        else:
+            self.gameUIWindow.blit(self.moneyIcon, (200,810))
+
+
         if self.inGameMenu:
             if 50 < mousePos[0] < 250 and 450<mousePos[1]<550:
                 self.gameUIWindow.blit(pygame.transform.scale(self.leaveButton, (220, 110)), (40, 445))
@@ -1799,9 +1843,11 @@ class GameManager:
             self.gameUIWindow.blit(tempButton, (170, 590))
 
             
-
-        self.draw_text(str(int(self.money)), "BLACK", 100, 870, self.gameUIWindow, 50, True)
-        self.draw_text(str(self.health), "BLACK", 100, 800, self.gameUIWindow, 50, True)
+        if game.gamemode != "cashhealth":
+            self.draw_text(str(int(self.money)), "BLACK", 100, 870, self.gameUIWindow, 50, True)
+            self.draw_text(str(self.health), "BLACK", 100, 800, self.gameUIWindow, 50, True)
+        else:
+            self.draw_text(str(int(self.money)), "BLACK", 100, 830, self.gameUIWindow, 50, True)
 
 
     def broadcastRound(self):
@@ -2453,6 +2499,8 @@ class yarn:
         # Deletes Yarn and Applys Damage if it reaches the end of the map
         if self.checkpoint > len(self.mapCords) - 1:
             game.health -= self.damage
+            if game.gamemode == "cashhealth":
+                game.money -= self.damage
             if self not in game.yarnDeleteList:
                 game.yarnDeleteList.append(self)
 
