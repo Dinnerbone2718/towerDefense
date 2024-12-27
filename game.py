@@ -384,11 +384,6 @@ class Menu:
 
         self.shopButton = Button("shopButton", 325, 185, 110, 110)
 
-
-        self.easyButton = Button("easyButton", 255, 175, 110,110)
-        self.mediumButton = Button("mediumButton", 255, 175, 110,110)
-        self.hardButton = Button("hardButton", 255, 175, 110,110)
-
         self.map6buy = Button("map6buy", 210, 400, 220, 300)
         self.map7buy = Button("map7buy", 500, 400, 220, 300)
 
@@ -402,9 +397,13 @@ class Menu:
 
         self.menuCat = Button("menuCat",1015, 700, 210,240)
 
-        self.playInGameButton = Button("playButtonInGame", 290, 550, 190,120)
+        self.playInGameButton = Button("playButtonInGame", 290, 650, 190,120)
 
         self.back = Button("back", 1025, 165, 90, 90)
+
+        self.easyButton = Button("easyButton", 290, 415, 110,110)
+        self.mediumButton = Button("mediumButton", 290, 415, 110,110)
+        self.hardButton = Button("hardButton", 290, 415, 110,110)
 
         self.clock = pygame.time.Clock()
 
@@ -483,12 +482,7 @@ class Menu:
             self.nextButton.update()
             self.backButton.update()  
 
-            if self.difficulty == 1:
-                self.easyButton.update()
-            elif self.difficulty == 2:
-                self.mediumButton.update()
-            elif self.difficulty == 3:
-                self.hardButton.update()
+
 
         elif self.currentScreen == "settings":
             screen.blit(self.settingsMenu, (0,0))
@@ -555,6 +549,18 @@ class Menu:
             self.draw_text(str(self.nameLookup[self.mapDisplay]), "BLACK", 400, 200, 70)
             self.playInGameButton.update()
             self.back.update()
+
+            if self.difficulty == 1:
+                self.easyButton.update()
+                self.draw_text("Easy", "BLACK", 500, 415, 70, True)
+            elif self.difficulty == 2:
+                self.mediumButton.update()
+                self.draw_text("Medium", "BLACK", 500, 415, 70, True)
+            elif self.difficulty == 3:
+                self.hardButton.update()
+                self.draw_text("Hard", "BLACK", 500, 415, 70, True)
+
+
 
 class Audio:
     def __init__(self):
