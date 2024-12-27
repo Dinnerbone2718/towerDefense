@@ -46,10 +46,10 @@ pygame.display.set_icon(pygame.image.load(f"{prefix}icon1.png"))
 service_account_key = f"{prefix}towerdefense-ce12a-firebase-adminsdk-pz797-cafdf36b1a.json"
 
 # Initialize the Firebase Admin SDK
-cred = credentials.Certificate(service_account_key)
-firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://towerdefense-ce12a-default-rtdb.firebaseio.com/'
-})
+#cred = credentials.Certificate(service_account_key)
+#firebase_admin.initialize_app(cred, {
+    #'databaseURL': 'https://towerdefense-ce12a-default-rtdb.firebaseio.com/'
+#})
 
 
 
