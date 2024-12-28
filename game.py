@@ -2052,9 +2052,10 @@ class entity:
         # Sets up list for lightning
         self.cords = []
 
-        self.target = (target[0] if target[0]<900 else 900, target[1] if target[1]<900 else 900)
+        if target:
+            self.target = (target[0] if target[0]<900 else 900, target[1] if target[1]<900 else 900)
 
-        self.target = (target[0] if target[0]>0 else 0, target[1] if target[1]>0 else 0)
+            self.target = (target[0] if target[0]>0 else 0, target[1] if target[1]>0 else 0)
 
         if self.special == "lightning" or self.special == "superLightning":
             self.target = 10
@@ -3156,6 +3157,10 @@ class towerEntity:
         # Loads Stats
         self.updateImage()
 
+        self.costOtherBuff = 1
+        if game.difficulty == 3:
+            self.costOtherBuff = 1.5
+
         # Add this tower instance to the game map's list of towers
         game.towersOnMap.append(self)
 
@@ -3509,12 +3514,12 @@ class towerEntity:
         self.rangeBuff=1     
         self.yarnBuff = False
         if game.difficulty == 3:
-            self.costBuff = 1.5
+            self.costOtherBuff = 1.5
 
 
     # Draw the tower image at its position on the game map
     def draw(self):
-
+        
         if self.name == "Fat":
             self.rotation = 270
 
@@ -3548,7 +3553,7 @@ class towerEntity:
         if self.leftUpgrade < 4 and ((self.rightUpgrade > 1 and self.leftUpgrade == 1) == False):
             leftUpgrade = self.upgradeImages[f"{self.leftUpgrade+1}-0"]
             leftCost = upgradePrices.get(f"{self.leftUpgrade+1}-0", float('inf'))
-            leftCost = int(leftCost*self.costBuff)
+            leftCost = int(leftCost*self.costBuff*self.costOtherBuff)
             canAffordLeft = game.money >= leftCost
 
             if 300 < mousePos[0] < 600 and 20 + game.vertOffset < mousePos[1] < 180 + game.vertOffset:
@@ -3558,7 +3563,7 @@ class towerEntity:
                 leftUpgrade = pygame.transform.scale(leftUpgrade, (320, 160))
                 game.gameWindow.blit(leftUpgrade, (0, 20 + game.vertOffset))
                 if mousePress[0] and mouseUp:
-                    game.money -= upgradePrices.get(f"{self.leftUpgrade+1}-0", 0)*self.costBuff
+                    game.money -= upgradePrices.get(f"{self.leftUpgrade+1}-0", 0)*self.costBuff* self.costOtherBuff
                     self.value += upgradePrices.get(f"{self.leftUpgrade+1}-0", 0)
                     self.leftUpgrade += 1
                     self.updateImage()
@@ -3572,7 +3577,7 @@ class towerEntity:
         if self.rightUpgrade < 4 and ((self.leftUpgrade > 1 and self.rightUpgrade == 1) == False):
             rightUpgrade = self.upgradeImages[f"0-{self.rightUpgrade+1}"]
             rightCost = upgradePrices.get(f"0-{self.rightUpgrade+1}", float('inf'))
-            rightCost = int(rightCost*self.costBuff)
+            rightCost = int(rightCost*self.costBuff*self.costOtherBuff)
             canAffordRight = game.money >= rightCost
 
             if 800 < mousePos[0] < 1100 and 20 + game.vertOffset < mousePos[1] < 180 + game.vertOffset:
@@ -3583,7 +3588,7 @@ class towerEntity:
                 rightUpgrade = pygame.transform.scale(rightUpgrade, (320, 160))
                 game.gameWindow.blit(rightUpgrade, (490, 20 + game.vertOffset))
                 if mousePress[0] and mouseUp:
-                    game.money -= upgradePrices.get(f"0-{self.rightUpgrade+1}", 0)*self.costBuff
+                    game.money -= upgradePrices.get(f"0-{self.rightUpgrade+1}", 0)*self.costBuff*self.costOtherBuff
                     self.value += upgradePrices.get(f"0-{self.rightUpgrade+1}", 0)
                     self.rightUpgrade += 1
                     self.updateImage()
