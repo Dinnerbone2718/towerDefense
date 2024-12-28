@@ -3542,6 +3542,7 @@ class towerEntity:
 
     # Create the upgrade button for the player
     def handleUpgrades(self):
+        return
         # Dynamically select the correct upgrade price dictionary based on cat type
         tempName = re.sub(r'\d+', '', self.name)
         upgradePrices = getattr(towerSelect, f"towerUpgradePrices{tempName}", {})
