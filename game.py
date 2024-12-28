@@ -3819,45 +3819,48 @@ def main():
             offsetx = (screenDis.get_width() - screen.get_width()) // 2
             offsety = (screenDis.get_height() - screen.get_height()) // 2
 
-            screenDis.blit(screen, (offsetx, offsety))
 
-            topRow = [screen.get_at((x, 0)) for x in range(1200)]
-            rightColumn = [screen.get_at((1200 - 1, y)) for y in range(900)]
-            bottomRow = [screen.get_at((x, 900 - 1)) for x in range(1200)]
-            leftColumn = [screen.get_at((0, y)) for y in range(900)]
+            if inGame == False:
+                topRow = [screen.get_at((x, 0)) for x in range(1200)]
+                rightColumn = [screen.get_at((1200 - 1, y)) for y in range(900)]
+                bottomRow = [screen.get_at((x, 900 - 1)) for x in range(1200)]
+                leftColumn = [screen.get_at((0, y)) for y in range(900)]
 
-            def average_color(pixels):
-                return tuple(
-                    sum(pixel[i] for pixel in pixels) // len(pixels) for i in range(3) 
+                def average_color(pixels):
+                    return tuple(
+                        sum(pixel[i] for pixel in pixels) // len(pixels) for i in range(3) 
+                    )
+                
+                avgTop = (
+                    (average_color(topRow)[0] + avgTop[0] * 19) / 20, 
+                    (average_color(topRow)[1] + avgTop[1] * 19) / 20, 
+                    (average_color(topRow)[2] + avgTop[2] * 19) / 20
                 )
-            
-            avgTop = (
-                (average_color(topRow)[0] + avgTop[0] * 19) / 20, 
-                (average_color(topRow)[1] + avgTop[1] * 19) / 20, 
-                (average_color(topRow)[2] + avgTop[2] * 19) / 20
-            )
-            avgRight = (
-                (average_color(rightColumn)[0] + avgRight[0] * 19) / 20, 
-                (average_color(rightColumn)[1] + avgRight[1] * 19) / 20, 
-                (average_color(rightColumn)[2] + avgRight[2] * 19) / 20
-            )
-            avgBottom = (
-                (average_color(bottomRow)[0] + avgBottom[0] * 19) / 20, 
-                (average_color(bottomRow)[1] + avgBottom[1] * 19) / 20, 
-                (average_color(bottomRow)[2] + avgBottom[2] * 19) / 20
-            )
-            avgLeft = (
-                (average_color(leftColumn)[0] + avgLeft[0] * 19) / 20, 
-                (average_color(leftColumn)[1] + avgLeft[1] * 19) / 20, 
-                (average_color(leftColumn)[2] + avgLeft[2] * 19) / 20
-            )
+                avgRight = (
+                    (average_color(rightColumn)[0] + avgRight[0] * 19) / 20, 
+                    (average_color(rightColumn)[1] + avgRight[1] * 19) / 20, 
+                    (average_color(rightColumn)[2] + avgRight[2] * 19) / 20
+                )
+                avgBottom = (
+                    (average_color(bottomRow)[0] + avgBottom[0] * 19) / 20, 
+                    (average_color(bottomRow)[1] + avgBottom[1] * 19) / 20, 
+                    (average_color(bottomRow)[2] + avgBottom[2] * 19) / 20
+                )
+                avgLeft = (
+                    (average_color(leftColumn)[0] + avgLeft[0] * 19) / 20, 
+                    (average_color(leftColumn)[1] + avgLeft[1] * 19) / 20, 
+                    (average_color(leftColumn)[2] + avgLeft[2] * 19) / 20
+                )
 
 
 
-            pygame.draw.rect(screenDis, (avgTop), pygame.Rect(0, 0, screenDis.get_width(), offsety))
-            pygame.draw.rect(screenDis, (avgBottom), pygame.Rect(0, screenDis.get_height()-offsety, screenDis.get_width(), offsety))
-            pygame.draw.rect(screenDis, (avgLeft), pygame.Rect(0, 0, offsetx, screenDis.get_height()))
-            pygame.draw.rect(screenDis, (avgRight), pygame.Rect(screenDis.get_width()-offsetx, 0, offsetx, screenDis.get_height()))
+                pygame.draw.rect(screenDis, (avgTop), pygame.Rect(0, 0, screenDis.get_width(), offsety))
+                pygame.draw.rect(screenDis, (avgBottom), pygame.Rect(0, screenDis.get_height()-offsety, screenDis.get_width(), offsety))
+                pygame.draw.rect(screenDis, (avgLeft), pygame.Rect(0, 0, offsetx, screenDis.get_height()))
+                pygame.draw.rect(screenDis, (avgRight), pygame.Rect(screenDis.get_width()-offsetx, 0, offsetx, screenDis.get_height()))
+            else:
+                screenDis.fill("BLACK")
+            screenDis.blit(screen, (offsetx, offsety))
 
 
         else:
