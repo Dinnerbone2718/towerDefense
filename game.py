@@ -17,10 +17,12 @@ import tkinter as tk
 from tkinter import ttk
 from collections import deque
 import re
-
+import ctypes
 
 #re.sub(r'\d+', '', self.selected)
 #HarmonyOS Sans SC  Size = 28
+
+# Get the directory path of the current script*
 script_dir = os.path.dirname(os.path.abspath(__file__))
 prefix = f"{script_dir}/"
 
@@ -35,10 +37,16 @@ pygame.mixer.init()
 
 
 
-# Get the directory path of the current script*
 
 # Set up the main display window with double buffering for smoother rendering
-screen = pygame.display.set_mode((1200, 900), pygame.SCALED | pygame.DOUBLEBUF)
+
+user32 = ctypes.windll.user32
+screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+
+print(screensize)
+
+screenDis = pygame.display.set_mode((1200, 900), pygame.SCALED | pygame.DOUBLEBUF)
+screen = pygame.surface.Surface((1200, 900), pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption('Tower Defense')
 pygame.display.set_icon(pygame.image.load(f"{prefix}icon1.png"))
 
@@ -113,7 +121,7 @@ class Button:
             screen.blit(self.basic, (drawX, drawY))
 
     def special(self):
-        global inGame, ownedmaps, cash
+        global inGame, ownedmaps, cash, screenDis
         if self.name == "playButton":
             menu.currentScreen = "menu"
 
@@ -157,7 +165,11 @@ class Button:
             pygame.mixer.music.play(-1)  
             menu.currentScreen = "settings"
         if self.name == "toggleFullscreen":
-            pygame.display.toggle_fullscreen()
+            if screenDis.get_width() == 1200:
+                screenDis = pygame.display.set_mode((screensize[0], screensize[1]), pygame.SCALED | pygame.DOUBLEBUF | pygame.FULLSCREEN) 
+            else:
+                screenDis = pygame.display.set_mode((1200, 900), pygame.SCALED | pygame.DOUBLEBUF)
+
         if self.name == "joinButton":
             removeAFK()
             client.isOnline = True
@@ -3738,15 +3750,23 @@ pKeyRelease = True
 
 inGame = False
 
+offsetx = 0
+offsety = 0
+
+avgTop = (0,0,0)
+avgBottom = (0,0,0)
+avgLeft = (0,0,0)
+avgRight = (0,0,0)
 
 def main():
     
-    global mousePos, mousePress, mouseUp, pause, running
+    global mousePos, mousePress, mouseUp, pause, running, offsetx, offsety, avgTop, avgRight, avgLeft, avgBottom
     while running:
         # Get current mouse position and press states
         mousePos = pygame.mouse.get_pos()
         mousePress = pygame.mouse.get_pressed()
-        
+        mousePos = (mousePos[0]-offsetx, mousePos[1]-offsety)
+
         # Track if the left mouse button was just released
         if mousePress[0] == False:
             mouseUp = True
@@ -3794,6 +3814,59 @@ def main():
         # Reset mouse release tracking if button is pressed again
         if mousePress[0] == True:
             mouseUp = False
+        
+        if screenDis.get_width() != 1200:
+            offsetx = (screenDis.get_width() - screen.get_width()) // 2
+            offsety = (screenDis.get_height() - screen.get_height()) // 2
+
+            screenDis.blit(screen, (offsetx, offsety))
+
+            topRow = [screen.get_at((x, 0)) for x in range(1200)]
+            rightColumn = [screen.get_at((1200 - 1, y)) for y in range(900)]
+            bottomRow = [screen.get_at((x, 900 - 1)) for x in range(1200)]
+            leftColumn = [screen.get_at((0, y)) for y in range(900)]
+
+            def average_color(pixels):
+                return tuple(
+                    sum(pixel[i] for pixel in pixels) // len(pixels) for i in range(3) 
+                )
+            
+            avgTop = (
+                (average_color(topRow)[0] + avgTop[0] * 19) / 20, 
+                (average_color(topRow)[1] + avgTop[1] * 19) / 20, 
+                (average_color(topRow)[2] + avgTop[2] * 19) / 20
+            )
+            avgRight = (
+                (average_color(rightColumn)[0] + avgRight[0] * 19) / 20, 
+                (average_color(rightColumn)[1] + avgRight[1] * 19) / 20, 
+                (average_color(rightColumn)[2] + avgRight[2] * 19) / 20
+            )
+            avgBottom = (
+                (average_color(bottomRow)[0] + avgBottom[0] * 19) / 20, 
+                (average_color(bottomRow)[1] + avgBottom[1] * 19) / 20, 
+                (average_color(bottomRow)[2] + avgBottom[2] * 19) / 20
+            )
+            avgLeft = (
+                (average_color(leftColumn)[0] + avgLeft[0] * 19) / 20, 
+                (average_color(leftColumn)[1] + avgLeft[1] * 19) / 20, 
+                (average_color(leftColumn)[2] + avgLeft[2] * 19) / 20
+            )
+
+
+
+            pygame.draw.rect(screenDis, (avgTop), pygame.Rect(0, 0, screenDis.get_width(), offsety))
+            pygame.draw.rect(screenDis, (avgBottom), pygame.Rect(0, screenDis.get_height()-offsety, screenDis.get_width(), offsety))
+            pygame.draw.rect(screenDis, (avgLeft), pygame.Rect(0, 0, offsetx, screenDis.get_height()))
+            pygame.draw.rect(screenDis, (avgRight), pygame.Rect(screenDis.get_width()-offsetx, 0, offsetx, screenDis.get_height()))
+
+
+        else:
+            screenDis.blit(screen, (0,0))
+            offsetx = 0
+            offsety = 0
+
+
+
 
         pygame.display.flip()
 
