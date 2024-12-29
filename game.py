@@ -3542,7 +3542,6 @@ class towerEntity:
 
     # Create the upgrade button for the player
     def handleUpgrades(self):
-        return
         # Dynamically select the correct upgrade price dictionary based on cat type
         tempName = re.sub(r'\d+', '', self.name)
         upgradePrices = getattr(towerSelect, f"towerUpgradePrices{tempName}", {})
@@ -3561,10 +3560,11 @@ class towerEntity:
                 game.displayPrice = str(leftCost)
                 game.hover = hoverText.get(f"{self.leftUpgrade+1}-0", "ERROR")
             if 300 < mousePos[0] < 600 and 20 + game.vertOffset < mousePos[1] < 180 + game.vertOffset and canAffordLeft:
-                leftUpgrade = pygame.transform.scale(leftUpgrade, (320, 160))
+                
+                leftUpgrade = pygame.transform.scale(leftUpgrade, (320, 160)).convert_alpha()
                 game.gameWindow.blit(leftUpgrade, (0, 20 + game.vertOffset))
                 if mousePress[0] and mouseUp:
-                    game.money -= upgradePrices.get(f"{self.leftUpgrade+1}-0", 0)*self.costBuff* self.costOtherBuff
+                    game.money -= upgradePrices.get(f"{self.leftUpgrade+1}-0", 0)*self.costBuff*self.costOtherBuff
                     self.value += upgradePrices.get(f"{self.leftUpgrade+1}-0", 0)
                     self.leftUpgrade += 1
                     self.updateImage()
@@ -3866,11 +3866,11 @@ def main():
                 pygame.draw.rect(screenDis, (avgRight), pygame.Rect(screenDis.get_width()-offsetx, 0, offsetx, screenDis.get_height()))
             else:
                 screenDis.fill("BLACK")
-            screenDis.blit(screen, (offsetx, offsety))
+            screenDis.blit(screen.convert_alpha(), (offsetx, offsety))
 
 
         else:
-            screenDis.blit(screen, (0,0))
+            screenDis.blit(screen.convert_alpha(), (0,0))
             offsetx = 0
             offsety = 0
 
